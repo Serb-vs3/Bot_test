@@ -33,7 +33,7 @@ async def transcribe_audio(audio_file):
             model="whisper-1", 
             file=audio_file
         )
-        return response.text  # Исправленный доступ к тексту
+        return response.text 
     except Exception as e:
         return f"Ошибка при транскрипции аудио: {str(e)}"
 async def text_to_speech(text: str):
