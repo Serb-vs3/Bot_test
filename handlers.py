@@ -7,25 +7,32 @@ from aiogram import Bot
 from openai import AsyncOpenAI
 import os
 import tempfile
+from aiogram.types import ContentType
+
 async def handle_all_updates(message: types.Message, bot: Bot):
     logging.info(f"Обновление id={message.message_id} получено. Тип: {message.content_type}")
+    
+    if message.content_type == ContentType.TEXT:
+        await handle_text_message(message)
+    elif message.content_type == ContentType.VOICE:
+        await voice_handler(message, bot)
+
+async def handle_text_message(message: types.Message):
     if message.text == "/start":
         await start(message)
-        return
-    if message.content_type == "text":
+    else:
         warning_msg = await message.answer("Пожалуйста, отправь голосовое сообщение!")
         await asyncio.sleep(2)
         await message.delete()
         await warning_msg.delete()
-        return
-    elif message.content_type == "voice":
-        await voice_handler(message, bot)
+
 async def start(message: types.Message):
     try:
         await message.answer("Привет! Отправь мне голосовое сообщение, и я отвечу!")
     except Exception as e:
         logging.error(f"Ошибка в обработчике start: {e}", exc_info=True)
         await message.answer("Возникла ошибка, попробуйте снова.")
+
 async def voice_handler(message: types.Message, bot: Bot):
     try:
         processing_msg = await message.answer("Обрабатываю голосовое сообщение...")
